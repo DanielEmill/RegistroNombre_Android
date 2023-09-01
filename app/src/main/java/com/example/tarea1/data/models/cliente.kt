@@ -1,7 +1,7 @@
-package com.example.tarea1.models
+package com.example.tarea1.data.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-@Entity(tableName = "cliente")
+@Entity(tableName = "clientes")
 data class cliente (
     @PrimaryKey
     val clienteId: Int?=null ,
