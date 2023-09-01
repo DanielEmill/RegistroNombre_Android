@@ -4,6 +4,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "cliente")
 data class cliente (
     @PrimaryKey
-    val ticketId: Int?=null ,
+    val clienteId: Int?=null ,
     var nombre: String = "",
 )
