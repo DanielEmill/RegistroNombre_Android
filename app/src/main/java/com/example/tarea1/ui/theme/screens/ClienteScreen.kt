@@ -1,7 +1,7 @@
 package com.example.tarea1.ui.theme.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,11 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -23,7 +20,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,13 +27,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -45,7 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.tarea1.data.ClienteDb
 import com.example.tarea1.data.models.cliente
-import com.example.tarea1.ui.theme.Tarea1Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,6 +48,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Divider
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -122,20 +118,44 @@ fun ClienteScreen(viewModel: ClienteViewModel = hiltViewModel()) {
                             contentDescription = "Guardar")
                         Text(text = "Guardar")
                     }
-                    Text(text = "Lista: ", style =
-                    MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(Color.Gray)
+                            .padding(vertical = 8.dp)
+                    )
+                    Text(
+                        text = "Lista (${clientes.size} registros):",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(clientes){ Cliente ->
-                            Text(text = Cliente.nombre)
+                        items(clientes) { cliente ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "ID: ${cliente.clienteId}", fontWeight = FontWeight.Bold)
+                                Text(text = cliente.nombre)
+                                OutlinedButton(
+                                    onClick = {
+                                        viewModel.deleteCliente(cliente)
+                                    }
+                                ) {
+                                    Text(text = "Eliminar")
+                                }
+                            }
                         }
                     }
+
                 }
             }
         }
 
     }
-
-
 }
 
 
@@ -168,6 +188,13 @@ class ClienteViewModel @Inject constructor(
             limpiar()
         }
     }
+    fun deleteCliente(cliente: cliente) {
+        viewModelScope.launch {
+            clienteDb.ClienteDao.delete(cliente)
+            limpiar()
+        }
+    }
+
     private fun limpiar() {
         Nombre = ""
     }
